@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PriceScanner Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-family: Tahoma, Arial, sans-serif;
+      background: radial-gradient(circle at top left, #efe8dc 0, transparent 32rem), #f7f4ee;
+      padding: 32px;
+    }
+    h1 {
+      font-size: 22px;
+      color: #2f5f54;
+      margin-bottom: 8px;
+    }
+    a.btn {
+      display: block;
+      width: min(340px, 100%);
+      padding: 16px 24px;
+      border-radius: 10px;
+      font: bold 16px Tahoma, Arial, sans-serif;
+      text-decoration: none;
+      color: #fff;
+      text-align: center;
+      transition: opacity .15s;
+    }
+    a.btn:hover { opacity: .85; }
+    .btn-1 { background: #2f5f54; }
+    .btn-2 { background: #302b63; }
+    .btn-3 { background: #6a8f5f; }
+  </style>
+</head>
+<body>
+  <h1>🛠️ PriceScanner Settings</h1>
 
+  <a class="btn btn-1"
+     href="Dev__________Tool.html">
+    🔑 Developer Tool
+  </a>
+
+  <a class="btn btn-2"
+     href="info.json"
+     target="_blank">
+    📄 info.json
+  </a>
+
+  <a class="btn btn-3"
+     href="version.json"
+     target="_blank">
+    📦 version.json
+  </a>
+</body>
+</html>
