@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PriceScanner — أدوات info.json</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
+  <style>
+    :root {
+      --bg: #f7f4ee;
+      --line: #ded8cf;
+      --text: #1f2933;
+      --muted: #667085;
+      --accent: #6a8f5f;
+      --accent-2: #2f5f54;
+      --purple: #302b63;
+      --purple-dark: #1a1a2e;
+      --danger: #b42318;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background: radial-gradient(circle at top left, #efe8dc 0, transparent 32rem), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px;
+    }
+    .page-title {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .page-title h1 { font-size: 28px; color: var(--purple-dark); margin-bottom: 4px; }
+    .page-title p { color: var(--muted); font-size: 14px; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      max-width: 980px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 13px 10px;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      font: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .18s;
+    }
+    .tab-btn.active {
+      background: var(--purple);
+      border-color: var(--purple);
+      color: #fff;
+    }
+    .tab-btn:hover:not(.active) {
+      border-color: var(--purple);
+      color: var(--purple);
+    }
+
+    /* ── Panels ── */
+    .panel { display: none; max-width: 980px; margin: 0 auto; }
+    .panel.active { display: grid; gap: 16px; }
+
+    section {
+      background: rgba(255,255,255,.9);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 12px 36px rgba(31,41,51,.07);
+    }
+    section h2 {
+      font-size: 17px;
+      color: var(--purple-dark);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    /* ── Inputs ── */
+    input[type=text], input[type=password], input[type=url], textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(106,143,95,.16);
+    }
+    textarea {
+      resize: vertical;
+      direction: ltr;
+      text-align: left;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+    }
+
+    /* ── Input Mode Toggle ── */
+    .mode-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .mode-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s;
+    }
+    .mode-btn.active {
+      background: var(--purple);
+      border-color: var(--purple);
+      color: #fff;
+    }
+    .input-mode { display: none; }
+    .input-mode.active { display: block; }
+
+    /* ── File label ── */
+    .file-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--purple);
+      color: #fff;
+      padding: 9px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: background .15s;
+    }
+    .file-label:hover { background: var(--purple-dark); }
+    .file-label input { display: none; }
+    .file-status {
+      display: inline-block;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      min-width: 140px;
+    }
+    .file-status.ok { color: var(--accent-2); border-color: var(--accent); background: #f4f8f1; }
+    .file-status.err { color: var(--danger); border-color: var(--danger); }
+
+    /* ── Buttons ── */
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 18px;
+      font: inherit;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: opacity .15s;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) { opacity: .85; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-purple  { background: var(--purple); }
+    .btn-dark    { background: var(--purple-dark); }
+    .btn-green   { background: var(--accent-2); }
+    .btn-lime    { background: var(--accent); }
+    .btn-orange  { background: #ed8936; }
+    .btn-violet  { background: #9f7aea; }
+    .btn-blue    { background: #4299e1; }
+    .btn-full    { width: 100%; margin-top: 10px; font-size: 16px; padding: 14px; }
+
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 10px; align-items: start; }
+
+    /* ── Status / Output ── */
+    .status {
+      margin-top: 10px;
+      min-height: 22px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .status.ok  { color: var(--accent-2); }
+    .status.err { color: var(--danger); }
+
+    .output-box {
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px dashed var(--accent);
+      border-radius: 8px;
+      background: #f4f8f1;
+      direction: ltr;
+      text-align: left;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      min-height: 42px;
+      word-break: break-all;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 2px dashed var(--line);
+      margin: 16px 0;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .action-row .btn { flex: 1; min-width: 110px; }
+
+    .note {
+      margin-top: 14px;
+      background: #f0f4ff;
+      border-right: 3px solid var(--purple);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #444;
+    }
+
+    .verify-result {
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .verify-result.ok  { background: #f0fff4; color: #276749; border: 2px solid #48bb78; }
+    .verify-result.err { background: #fff5f5; color: #9b2c2c; border: 2px solid #fc8181; }
+
+    @media (max-width: 640px) {
+      .tabs { flex-direction: column; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>🛠️ أدوات info.json</h1>
+  <p>PriceScanner Pro — توقيع الملف وإدارة كلمة مرور المطور</p>
+</div>
+
+<!-- Tab buttons -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="sign">🔐 توقيع info.json</button>
+  <button class="tab-btn" data-tab="devpass">🔑 كلمة مرور المطور</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 1 — SIGN
+══════════════════════════════════════════ -->
+<div class="panel active" id="tab-sign">
+
+  <section>
+    <h2>الخطوة 1 — المفتاح الخاص</h2>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-for="key" data-mode="file">📎 رفع ملف</button>
+      <button class="mode-btn"        data-for="key" data-mode="text">✏️ لصق نص</button>
+    </div>
+
+    <!-- File mode -->
+    <div class="input-mode active" id="key-file">
+      <div class="row">
+        <label class="file-label">
+          📎 InfoJsonPrivateKey.DO_NOT_SHIP.pem
+          <input type="file" id="keyFile" accept=".pem,.key">
+        </label>
+        <span id="keyFileStatus" class="file-status">لم يتم تحميل ملف</span>
+      </div>
+    </div>
+
+    <!-- Text mode -->
+    <div class="input-mode" id="key-text">
+      <textarea id="keyTextArea" rows="8" placeholder="-----BEGIN RSA PRIVATE KEY-----
+...
+-----END RSA PRIVATE KEY-----"></textarea>
+      <div class="row">
+        <button class="btn btn-purple" id="keyTextLoad">✔ تحميل المفتاح</button>
+        <span id="keyTextStatus" class="file-status">لم يتم تحميل مفتاح</span>
+      </div>
+    </div>
+
+    <div id="keyInfo" class="status"></div>
+  </section>
+
+  <section>
+    <h2>الخطوة 2 — ملف info.json</h2>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-for="json" data-mode="file">📎 رفع ملف</button>
+      <button class="mode-btn"        data-for="json" data-mode="text">✏️ لصق نص</button>
+    </div>
+
+    <!-- File mode -->
+    <div class="input-mode active" id="json-file">
+      <div class="row">
+        <label class="file-label">
+          📎 info.json
+          <input type="file" id="jsonFile" accept=".json">
+        </label>
+        <span id="jsonFileStatus" class="file-status">لم يتم تحميل ملف</span>
+      </div>
+    </div>
+
+    <!-- Text mode -->
+    <div class="input-mode" id="json-text">
+      <textarea id="jsonTextArea" rows="10" placeholder='{"developerPasswordEncrypted":"...","subscriptions":[...]}'></textarea>
+      <div class="row">
+        <button class="btn btn-purple" id="jsonTextLoad">✔ تحميل JSON</button>
+        <span id="jsonTextStatus" class="file-status">لم يتم تحميل JSON</span>
+      </div>
+    </div>
+  </section>
+
+  <button class="btn btn-dark btn-full" id="signBtn" disabled>🚀 توقيع الملف (RSA-SHA256)</button>
+  <div id="signMsg" class="status"></div>
+
+  <section id="signOutput" style="display:none;">
+    <h2>✅ النتيجة — info.json الموقّع</h2>
+    <textarea id="signedOutput" rows="14" readonly></textarea>
+    <div class="action-row">
+      <button class="btn btn-orange" id="signCopy">📋 نسخ</button>
+      <button class="btn btn-violet" id="signDownload">💾 تحميل</button>
+      <button class="btn btn-blue"   id="signVerify">🔍 تحقق من التوقيع</button>
+    </div>
+    <div id="verifyResult"></div>
+    <div class="note">
+      🔒 يستخدم <strong>node-forge</strong> مع <strong>RSA-SHA256 (PKCS#1 v1.5)</strong> — مطابق تماماً لـ
+      <code>crypto.sign('RSA-SHA256', ...)</code> في Node.js
+    </div>
+  </section>
+
+</div><!-- /tab-sign -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 2 — DEV PASSWORD
+══════════════════════════════════════════ -->
+<div class="panel" id="tab-devpass">
+
+  <section>
+    <h2>1. تشفير كلمة مرور المطور</h2>
+    <div class="grid-2">
+      <input id="passwordInput" type="password" placeholder="اكتب كلمة مرور المطور">
+      <button class="btn btn-green" id="encryptBtn">تشفير</button>
+    </div>
+    <textarea id="jsonEncOutput" rows="5" readonly placeholder="سيظهر JSON هنا" style="margin-top:10px;"></textarea>
+    <div class="row">
+      <button class="btn btn-lime" id="copyJsonBtn">📋 نسخ JSON</button>
+    </div>
+    <div id="encryptStatus" class="status"></div>
+  </section>
+
+  <section>
+    <h2>2. فك تشفير الباسورد — من رابط أو نص</h2>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-for="dec" data-mode="url">🌐 من رابط</button>
+      <button class="mode-btn"        data-for="dec" data-mode="paste">✏️ لصق JSON</button>
+    </div>
+
+    <!-- URL mode -->
+    <div class="input-mode active" id="dec-url">
+      <div class="grid-2" style="margin-top:10px;">
+        <input id="jsonUrl" type="url" value="https://raw.githubusercontent.com/Juba-Juba/052032/refs/heads/main/info.json">
+        <button class="btn btn-green" id="readBtn">قراءة وفك</button>
+      </div>
+    </div>
+
+    <!-- Paste mode -->
+    <div class="input-mode" id="dec-paste">
+      <textarea id="jsonPaste" rows="8" placeholder='{"developerPasswordEncrypted":"psenc.v1...."}'
+                style="margin-top:10px;"></textarea>
+      <div class="row">
+        <button class="btn btn-green" id="decPasteBtn">فك التشفير</button>
+      </div>
+    </div>
+
+    <div id="plainPassword" class="output-box"></div>
+    <div id="readStatus" class="status"></div>
+  </section>
+
+</div><!-- /tab-devpass -->
+
+
+<script>
+/* ─────────────────────────────────────────────
+   SHARED — Tab switching
+───────────────────────────────────────────── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ─────────────────────────────────────────────
+   SHARED — Input mode toggles (file / text / url / paste)
+───────────────────────────────────────────── */
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const forKey = btn.dataset.for;
+    const mode   = btn.dataset.mode;
+    // deactivate siblings
+    document.querySelectorAll(`.mode-btn[data-for="${forKey}"]`)
+      .forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // hide all input-modes for this group, show target
+    document.querySelectorAll(`[id^="${forKey}-"]`).forEach(el => el.classList.remove('active'));
+    const target = document.getElementById(`${forKey}-${mode}`);
+    if (target) target.classList.add('active');
+  });
+});
+
+
+/* ═══════════════════════════════════════════
+   SIGN TOOL
+═══════════════════════════════════════════ */
+const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA1DN00vSi35CkoH6ZXOg0
+cFVF4mlt4f8vbfTbRwweCuwxGwo/T2C2oDVvBsCFeJZXtEkgoa+1mnjdsICr99n0
++HWSlmWxnzVIW3gqshs/ahkeTt1oLxyRx4ALWUM+Tr+y3vBsPZLHl/7XkvJYfrJM
+Wjl2tCK/9H1KOtKEwllqqx78TduDhsXTDcpJ2y1KWZfgSwh7mvAnLRC6/IIDAjlz
+K9ZnZTMpIJZ6FlZ/IqLnN3iIsfUMQGtBc+5O+haXFRlhYwNEg0t69yN/H5vFMHXQ
++H4vnB0Xxdk1Ieb2lJqFpVZ5d+IjLThgEyoyRb4TU0ScqCPDWBbJfyyFxFg1JhbY
+WTUYhaWakA4Ixs6o3cYIpM+1H4MnApI9RNAbsyIGbpuobW+1DktapNniphcemeVE
+xPqlSGiDtIfQEt3KhBsouHTaHdDwAixwo030Dnl6VGQzF4NuqzSESmrBgLimSuMH
+9vuc7NKusksGYW1q1PtoYGqy2YC4kubhW7Hv5dCU0bF3AgMBAAE=
+-----END PUBLIC KEY-----`;
+
+let privateKeyPem = null;
+let jsonObject    = null;
+
+function signMsg(text, type) {
+  const el = document.getElementById('signMsg');
+  el.textContent = text;
+  el.className = 'status' + (type === 'ok' ? ' ok' : type === 'err' ? ' err' : '');
+  if (type) setTimeout(() => { if (el.textContent === text) el.textContent = ''; }, 7000);
+}
+
+function canonicalize(value, skipSignature = false) {
+  if (value === null || value === undefined) return 'null';
+  if (Array.isArray(value)) return `[${value.map(v => canonicalize(v)).join(',')}]`;
+  if (typeof value === 'object') {
+    const keys = Object.keys(value).filter(k => !(skipSignature && k === 'signature')).sort();
+    return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalize(value[k])}`).join(',')}}`;
+  }
+  if (typeof value === 'string') return JSON.stringify(value);
+  if (typeof value === 'number') { if (!Number.isFinite(value)) throw new Error('Non-finite number'); return String(value); }
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  throw new Error(`Unsupported type: ${typeof value}`);
+}
+
+function toBase64Url(b64) { return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/g,''); }
+
+function tryLoadPrivateKey(pem) {
+  const key = forge.pki.privateKeyFromPem(pem); // throws if invalid
+  privateKeyPem = pem;
+  return key;
+}
+
+function setKeyStatus(el, ok, name) {
+  el.textContent = ok ? `✅ ${name}` : `❌ ${name}`;
+  el.className = 'file-status ' + (ok ? 'ok' : 'err');
+  document.getElementById('keyInfo').textContent = ok ? '✅ المفتاح صالح وجاهز للتوقيع' : '❌ المفتاح غير صالح';
+  document.getElementById('keyInfo').className = 'status ' + (ok ? 'ok' : 'err');
+  checkSignReady();
+}
+
+function setJsonStatus(el, ok, name) {
+  el.textContent = ok ? `✅ ${name}` : `❌ ${name}`;
+  el.className = 'file-status ' + (ok ? 'ok' : 'err');
+  checkSignReady();
+}
+
+function checkSignReady() {
+  document.getElementById('signBtn').disabled = !(privateKeyPem && jsonObject);
+}
+
+// File: private key
+document.getElementById('keyFile').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  const el   = document.getElementById('keyFileStatus');
+  if (!file) { privateKeyPem = null; el.textContent = 'لم يتم تحميل ملف'; el.className='file-status'; checkSignReady(); return; }
+  try {
+    const text = await file.text();
+    tryLoadPrivateKey(text);
+    setKeyStatus(el, true, file.name);
+  } catch { privateKeyPem = null; setKeyStatus(el, false, file.name); }
+});
+
+// Text: private key
+document.getElementById('keyTextLoad').addEventListener('click', () => {
+  const el  = document.getElementById('keyTextStatus');
+  const pem = document.getElementById('keyTextArea').value.trim();
+  if (!pem) { signMsg('أدخل نص المفتاح أولاً.', 'err'); return; }
+  try {
+    tryLoadPrivateKey(pem);
+    setKeyStatus(el, true, 'مفتاح من النص');
+  } catch (err) { privateKeyPem = null; setKeyStatus(el, false, 'خطأ: ' + err.message); }
+});
+
+// File: json
+document.getElementById('jsonFile').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  const el   = document.getElementById('jsonFileStatus');
+  if (!file) { jsonObject = null; el.textContent = 'لم يتم تحميل ملف'; el.className='file-status'; checkSignReady(); return; }
+  try {
+    jsonObject = JSON.parse(await file.text());
+    setJsonStatus(el, true, file.name);
+  } catch { jsonObject = null; setJsonStatus(el, false, 'JSON غير صالح'); }
+});
+
+// Text: json
+document.getElementById('jsonTextLoad').addEventListener('click', () => {
+  const el   = document.getElementById('jsonTextStatus');
+  const text = document.getElementById('jsonTextArea').value.trim();
+  if (!text) { signMsg('أدخل نص JSON أولاً.', 'err'); return; }
+  try {
+    jsonObject = JSON.parse(text);
+    setJsonStatus(el, true, 'JSON من النص');
+  } catch { jsonObject = null; setJsonStatus(el, false, 'JSON غير صالح'); }
+});
+
+// Sign
+document.getElementById('signBtn').addEventListener('click', () => {
+  if (!privateKeyPem || !jsonObject) return;
+  const btn = document.getElementById('signBtn');
+  try {
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري التوقيع...';
+    signMsg('🔄 جاري التوقيع...', '');
+
+    const obj = { ...jsonObject };
+    delete obj.signature;
+    const canonical = canonicalize(obj, true);
+
+    const privKey = forge.pki.privateKeyFromPem(privateKeyPem);
+    const md = forge.md.sha256.create();
+    md.update(canonical, 'utf8');
+    const sigBytes = privKey.sign(md);
+    const sig = toBase64Url(forge.util.encode64(sigBytes));
+
+    const signed = { ...obj, signature: `pssig.v1.${sig}` };
+    document.getElementById('signedOutput').value = JSON.stringify(signed, null, 2) + '\n';
+    document.getElementById('signOutput').style.display = '';
+    document.getElementById('verifyResult').innerHTML = '';
+    signMsg('✅ تم التوقيع بنجاح!', 'ok');
+  } catch (err) {
+    signMsg(`❌ فشل التوقيع: ${err.message}`, 'err');
+    document.getElementById('signOutput').style.display = 'none';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 توقيع الملف (RSA-SHA256)';
+  }
+});
+
+// Copy signed
+document.getElementById('signCopy').addEventListener('click', () => {
+  const text = document.getElementById('signedOutput').value;
+  if (!text) return;
+  navigator.clipboard.writeText(text)
+    .then(() => signMsg('📋 تم النسخ!', 'ok'))
+    .catch(() => { document.getElementById('signedOutput').select(); document.execCommand('copy'); signMsg('📋 تم النسخ!', 'ok'); });
+});
+
+// Download signed
+document.getElementById('signDownload').addEventListener('click', () => {
+  const text = document.getElementById('signedOutput').value;
+  if (!text) return;
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([text], {type:'application/json'})),
+    download: 'info.json'
+  });
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  signMsg('💾 تم التحميل!', 'ok');
+});
+
+// Verify
+document.getElementById('signVerify').addEventListener('click', () => {
+  const resEl = document.getElementById('verifyResult');
+  try {
+    const json = JSON.parse(document.getElementById('signedOutput').value);
+    const sig  = json.signature;
+    if (!sig?.startsWith('pssig.v1.')) { resEl.innerHTML = `<div class="verify-result err">❌ التوقيع غير موجود أو غير صحيح</div>`; return; }
+
+    const b64url = sig.replace('pssig.v1.', '');
+    const obj = { ...json }; delete obj.signature;
+    const canonical = canonicalize(obj, true);
+
+    const pubKey = forge.pki.publicKeyFromPem(PUBLIC_KEY_PEM);
+    const md = forge.md.sha256.create();
+    md.update(canonical, 'utf8');
+    let b64 = b64url.replace(/-/g,'+').replace(/_/g,'/');
+    while (b64.length % 4) b64 += '=';
+    const valid = pubKey.verify(md.digest().bytes(), forge.util.decode64(b64));
+
+    resEl.innerHTML = valid
+      ? `<div class="verify-result ok">✅ التوقيع صحيح!</div>`
+      : `<div class="verify-result err">❌ التوقيع غير صحيح!</div>`;
+    signMsg(valid ? '✅ التوقيع صحيح!' : '❌ التوقيع غير صحيح!', valid ? 'ok' : 'err');
+  } catch (err) {
+    resEl.innerHTML = `<div class="verify-result err">❌ خطأ في التحقق: ${err.message}</div>`;
+  }
+});
+
+
+/* ═══════════════════════════════════════════
+   DEVELOPER PASSWORD TOOL
+═══════════════════════════════════════════ */
+const KEY_TEXT = "PriceScanner.DeveloperPassword.LinkKey.v1";
+const tenc = new TextEncoder();
+const tdec = new TextDecoder();
+
+function toBase64(bytes) {
+  let b = ''; bytes.forEach(x => b += String.fromCharCode(x)); return btoa(b);
+}
+function fromBase64(s) {
+  const b = atob(s); const a = new Uint8Array(b.length);
+  for (let i=0;i<b.length;i++) a[i]=b.charCodeAt(i); return a;
+}
+async function getAesKey() {
+  const h = await crypto.subtle.digest('SHA-256', tenc.encode(KEY_TEXT));
+  return crypto.subtle.importKey('raw', h, 'AES-GCM', false, ['encrypt','decrypt']);
+}
+async function encryptPassword(pw) {
+  const iv  = crypto.getRandomValues(new Uint8Array(12));
+  const key = await getAesKey();
+  const ct  = new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv}, key, tenc.encode(pw)));
+  return `psenc.v1.${toBase64(iv)}.${toBase64(ct)}`;
+}
+async function decryptPassword(value) {
+  if (typeof value === 'string') {
+    const p = value.split('.');
+    if (p.length!==4||p[0]!=='psenc'||p[1]!=='v1') return null;
+    const key = await getAesKey();
+    const plain = await crypto.subtle.decrypt({name:'AES-GCM',iv:fromBase64(p[2])}, key, fromBase64(p[3]));
+    return tdec.decode(plain);
+  }
+  if (value && typeof value === 'object') {
+    const iv = value.iv||value.nonce;
+    const ct = value.value||value.data||value.cipher||value.ciphertext;
+    if (!iv||!ct) return null;
+    const key = await getAesKey();
+    return tdec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:fromBase64(iv)}, key, fromBase64(ct)));
+  }
+  return null;
+}
+async function findEncryptedPassword(node) {
+  if (!node||typeof node!=='object') return null;
+  for (const [k,v] of Object.entries(node)) {
+    const n = k.replace(/[_-]/g,'').toLowerCase();
+    if (['developerpasswordencrypted','developerpasswordcipher','masterpasswordencrypted','devpasswordencrypted','developerpasswordhash'].includes(n)) {
+      const p = await decryptPassword(v); if (p) return p;
+    }
+    const nested = await findEncryptedPassword(v); if (nested) return nested;
+  }
+  return null;
+}
+
+function decStatus(text, type) {
+  const el = document.getElementById('readStatus');
+  el.textContent = text;
+  el.className = 'status' + (type==='ok'?' ok':type==='err'?' err':'');
+}
+
+document.getElementById('encryptBtn').addEventListener('click', async () => {
+  const el = document.getElementById('encryptStatus');
+  el.className = 'status';
+  try {
+    const pw = document.getElementById('passwordInput').value;
+    if (!pw) throw new Error('اكتب كلمة المرور أولاً.');
+    const enc = await encryptPassword(pw);
+    document.getElementById('jsonEncOutput').value = JSON.stringify({developerPasswordEncrypted: enc}, null, 2);
+    el.textContent = 'تم التشفير. انسخ JSON وضعه في info.json.';
+    el.className = 'status ok';
+  } catch(err) {
+    el.textContent = err.message||'تعذر التشفير.';
+    el.className = 'status err';
+  }
+});
+
+document.getElementById('copyJsonBtn').addEventListener('click', async () => {
+  const v = document.getElementById('jsonEncOutput').value;
+  if (!v) return;
+  await navigator.clipboard.writeText(v);
+  const el = document.getElementById('encryptStatus');
+  el.textContent = 'تم نسخ JSON.'; el.className='status ok';
+});
+
+async function runDecrypt(json) {
+  document.getElementById('plainPassword').textContent = '';
+  try {
+    const plain = await findEncryptedPassword(json);
+    if (!plain) throw new Error('لم يتم العثور على باسورد مشفر قابل للفك.');
+    document.getElementById('plainPassword').textContent = plain;
+    decStatus('تم فك التشفير بنجاح.', 'ok');
+  } catch(err) {
+    decStatus(err.message||'تعذر فك التشفير.', 'err');
+  }
+}
+
+document.getElementById('readBtn').addEventListener('click', async () => {
+  decStatus('', '');
+  try {
+    const res = await fetch(document.getElementById('jsonUrl').value, {cache:'no-store'});
+    if (!res.ok) throw new Error(`فشل تحميل الملف: ${res.status}`);
+    runDecrypt(await res.json());
+  } catch(err) {
+    decStatus(err.message||'تعذر قراءة الملف.', 'err');
+  }
+});
+
+document.getElementById('decPasteBtn').addEventListener('click', () => {
+  decStatus('', '');
+  try {
+    const json = JSON.parse(document.getElementById('jsonPaste').value);
+    runDecrypt(json);
+  } catch {
+    decStatus('النص ليس JSON صحيحاً.', 'err');
+  }
+});
+</script>
+</body>
+</html>
