@@ -1,0 +1,23 @@
+{
+  "developerPasswordEncrypted": "psenc.v1.MPYQPTA7zqhlATKE.FFNRTmEX38INILFt0GRTzIzUvdYa",
+  "subscriptions": [
+    {
+      "encryptedId": "JUBA_SdlIkKze3YdUmR9v1sf5uA==",
+      "serial": "O7BXNVMOT19EGPZTQP52FE",
+      "enabled": true,
+      "expiresAt": "2027-12-31"
+    },
+    {
+      "serial": "AAUXNSMOT19HFJVEQP501E",
+      "enabled": true,
+      "expiresAt": "2027-12-31"
+    },
+    {
+      "encryptedId": "JUBA_SdlIkKze3YdUmR9v1sf5uA==",
+      "serial": "F7BXNVMOT19EGFINQP574E",
+      "enabled": true,
+      "expiresAt": "2027-12-31"
+    }
+  ],
+  "signature": "pssig.v1.0CDqTlVJ-_UkGw2PgKHOOze6DacWa8wFSAfQlLnkBec_PadxZVCmMjE9p-Ij66sEFPiFemblxszUgGgh0h_x09OtRL616BUieRY1DMsdbiwsG5cNDOrjc_sD8T3o7zdeDwY-x7kI4K-UV0GbCQewooy1fHuSQfH3oj6B0VW4gMD0ISuJ9hCWTgHSrKsi7cq-bOEfOfSBcEZnEOzBt1ZChS5WOFNWBQG9rLqXRrLaC5_woXOmDr1QBK_T69KJdLID4cUbh-2kRESoZjGKl4pjuBCx86eQEiTfizsEdV-nETbN8_1JOBuVPK0ruQ3xgZkYLOXa9T6z1vg3EKDagRJBdDDzyKde1-y6Kd9eZ1p-rlWAZrde4ovFGdRGck0oG-2fq1IxuxGzqNDqNz-kVbIyWSayfE3lPDznLj9cfDJ_crpdsrQf3Jm5mZMZTtzOHncvZXVjTAPMKD7uNYQGodPTrTQ_QXnpSdsbbqIXMZHwMv5nf6HQWIKWKRYBYix-B6_a"
+}
