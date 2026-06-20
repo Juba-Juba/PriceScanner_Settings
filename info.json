@@ -8,29 +8,7 @@
       "expiresAt": "2027-12-31"
     },
     {
-      "serial": "AAUXNSMOT19HFJVEQP501E",
-      "enabled": true,
-      "expiresAt": "2027-12-31"
-    },
-    {
-      "encryptedId": "JUBA_SdlIkKze3YdUmR9v1sf5uA==",
-      "serial": "P7BXNONOT19FG2F9QP5436",
-      "enabled": true,
-      "expiresAt": "2027-12-31"
-    },
-    {
-      "encryptedId": "JUBA_SdlIkKze3YdUmR9v1sf5uA==",
-      "serial": "Q7BXNONOT19FGRJDQP5851",
-      "enabled": true,
-      "expiresAt": "2027-12-31"
-    },
-    {
-      "encryptedId": "JUBA_SdlIkKze3YdUmR9v1sf5uA==",
-      "serial": "F7BXNVMOT19EGFINQP574E",
-      "enabled": true,
-      "expiresAt": "2027-12-31"
-    },
-    {
+      "encryptedId": "JUBA_S9hHl6Ss3YBWlxgc37T+yA==",
       "serial": "E7BOQPMOT198H3MXTO39E1",
       "enabled": true,
       "expiresAt": "2027-12-31"
