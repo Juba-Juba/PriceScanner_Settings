@@ -12,7 +12,13 @@
       "serial": "17BXNRMOT198HTH4QP531D",
       "enabled": true,
       "expiresAt": "2027-12-31"
+    },
+    {
+      "encryptedId": "JUBA_S9hHl6Ss3YBWlxgc37T+yA==",
+      "serial": "J7BOQRMOT198H54PTO3FA5",
+      "enabled": true,
+      "expiresAt": "2027-12-31"
     }
   ],
-  "signature": "pssig.v1.sZMsFBl1ek8Pf2qR0fp8paz4sW0dZU3dyEBPDsmOKGNJVmvHpMsp_PZmQt85XMtTSmumduptHfzFAy2ZXDdlNM32xSZ3xBBUKK1BeyUI1zZ5bkp51BH7WmrQAMGMcjTTabQOJWK0ZWYY44RyfNORTEXjLcxOiaRrUCnBZU6gQdt_9ti32BOBdHUj9KUYba3OhVLZ7-RACMXeU3qtUGorjWCtu7MByf35Qs6IZaOWypHXJk5QHmuQ3wHUefZPz40q3UjWeBlgvxOsBJeSMP-mPPN_tCvYLN-xKXy0Z50BJvUVw4NFlLlKbigXuTkZdmC6Eu9rnoshGPPyvjkP-Ialcypi92tTnurn3b7ePUb0PgWnM0FHqfdL7wI9x9UPtJx8lnwRzX2LWIXXnTHbphcsbsm-9BPMo9gSrNk6xTyhq_p5LqJLpI-7Yz3n7fHYaUChEUkXOmnSQ1oHhBk-f_K8kamEUhcfQdc8ifPq9O158zNZRpygWv3MA75yvQ4awxtY"
+  "signature": "pssig.v1.t9EIESUt1WZyW7uDQ5-6XVqqblSH1WJfEWobuNMPttnJXPzz5cNBrFMvsV4J1X7179uWxGEEJFHoIeze728DxkhTSqmCxfesLXefINa2sZVpXn4r49oGIeUbaegNEWAPZKhIravUMn85ChpgGPDTV1TXY15anTchE6yuOrwygSQtOjcVMjB2pNdqqw5fUup0U62sFUz-B53X-_Z0ArAgoMKNNKM420jTgUqW2qL7s6wkeWefl3mEhuNEQwc_3dN5CYk8QA1gzVPqgiIArz7WtesjHNpZ2qaOlD_ldDpHh_HJK5OnNxSzFF2hHlKuuCinpalPgiOSieAfH2Hlz3u53fJYsaaDBrS3KcvLFSQ9m9ui9LPqr5IpKWXWBHuXJdUw2DrmWewIJmBK-v7-KZ5CpqneYvx_nhem-slH9dgKN7a4e5coyVkdGGauMatL68d5GP0M2iMN0vmq9seVXf9SWR6GotK5yTDz2CIvteoSRkO_v-nIc1rC4a6gHdJA5bo6"
 }
